@@ -13,8 +13,8 @@ int main (void) {
 	 * same pin as PB1.
 	 */
 	DDRB |= _BV(PB1);
-    // DDRB |= _BV(PB2);
-    // DDRB |= _BV(PB3);
+    DDRB |= _BV(PB2);
+    DDRD |= _BV(PD6);
     
 
 	/**
@@ -28,9 +28,11 @@ int main (void) {
 	 * speed).  The timer is used to determine when the PWM pin should be
 	 * on and when it should be off.
 	 */
-	TCCR1A |= _BV(COM1A1) | _BV(WGM10);
+	TCCR1A |= _BV(COM1A1) | _BV(COM1B1) | _BV(WGM10); // pins 1 and 2
 	TCCR1B |= _BV(CS10) | _BV(WGM12);
-
+    TCCR0A |= _BV(COM0A1) | _BV(WGM00) | _BV(WGM01); // pin 3
+	TCCR0B |= _BV(CS00);
+    
 
 	/**
 	 *  This loop is used to change the value in the OCR1A register.
@@ -56,7 +58,8 @@ int main (void) {
 	for(;;) {
 
 		OCR1A = pwm;
-        OCR1B = 255-pwm;
+        OCR1B = pwm;
+        OCR0A = 255 - pwm;
 
 		pwm += up ? 1 : -1;
 		if (pwm == 0xff)
@@ -64,7 +67,6 @@ int main (void) {
 		else if (pwm == 0x00)
 			up = true;
 
-		_delay_ms(10);
+		_delay_ms(5);
 	}
-
 }

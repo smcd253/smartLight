@@ -4,8 +4,8 @@
 int main(void)
 {
     int i = 0;
-    uint_32 j = 0;
-    uint_32 k = 0;
+    int j = 0;
+    int k = 0;
     DDRD |= (1 << DDD6);
     // PD6 is now an output
 
@@ -38,18 +38,26 @@ int main(void)
 
     while (1);
     {
-        i += 1;
-        if (i >= 256)
-            i = 0;
-        j += 512;
-        if (j >= 65536)
-            j = 0;
-        k += 1024;
-        if (k >= 65536)
-            k = 0;
-        OCR0A = i;
-        OCR1A = j;
-        OCR1B = k;
-        _delay_ms(10);
+        // i += 1;
+        // if (i >= 256)
+        //     i = 0;
+        // j += 512;
+        // if (j >= 65536)
+        //     j = 0;
+        // k += 1024;
+        // if (k >= 65536)
+        //     k = 0;
+        // OCR0A = i;
+        // OCR1A = j;
+        // OCR1B = k;
+
+        OCR0A = 64;
+        _delay_ms(100);
+        OCR0A = 128;
+        _delay_ms(100);
+        OCR0A = 192;
+        _delay_ms(100);
+        OCR0A = 255;
+        _delay_ms(100);     
     }
 }

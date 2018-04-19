@@ -134,8 +134,8 @@ void serial_init() {
     UCSR0C |= (1<<UCSZ00) | (1<<UCSZ01);
     UBRR0 = BAUD_PRESCALE;
     DDRD |= (1 << PD3);
-    //PORTD &= ~(1 << PD3);
-    PORTD |= 1 << PD3;
+    PORTD &= ~(1 << PD3);
+    //PORTD |= 1 << PD3;
     serial_write_string("----serial initialized----");
 }
 
@@ -160,7 +160,7 @@ uint8_t i2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
         while (!(TWCR & (1 << TWINT)));     // Wait for TWINT to be set
         status = TWSR & 0xf8;
         if (status != 0x08) {                 // Check that START was sent OK
-            serial_write_string(" CK1");
+            //serial_write_string(" CK1");
             return(status);
         }
 
@@ -170,10 +170,10 @@ uint8_t i2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
         status = TWSR & 0xf8;
         if (status != 0x18) {               // Check that SLA+W was sent OK
             if (status == 0x20) {             // Check for NAK
-                serial_write_string(" CK2");
+                //serial_write_string(" CK2");
                 goto nakstop;               // Send STOP condition
             }
-            serial_write_string(" CK3");
+            //serial_write_string(" CK3");
             return(status);                 // Otherwise just return the status
         }
 
@@ -198,10 +198,10 @@ uint8_t i2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an,
             status = TWSR & 0xf8;
             if (status != 0x28) {           // Check that data was sent OK
                 if (status == 0x30) {         // Check for NAK
-                    serial_write_string(" CK4");
+                    //serial_write_string(" CK4");
                     goto nakstop;           // Send STOP condition
                 }
-                serial_write_string(" CK5");
+                //serial_write_string(" CK5");
                 return(status);             // Otherwise just return the status
             }
         }
@@ -266,12 +266,8 @@ nakstop:                                    // Come here to send STOP after a NA
 
 uint8_t read8(uint8_t reg) {
     uint8_t data;
-    if (i2c_io(ISL_I2C_ADDR, NULL, 0, &reg, 1, NULL, 0)) {
-        serial_write_string(" Read8_w failed");
-        return data;
-    }
-    if (i2c_io(ISL_I2C_ADDR, NULL, 0, NULL, 0, &data, 1))
-        serial_write_string(" Read8_r failed");
+    i2c_io(ISL_I2C_ADDR, NULL, 0, &reg, 1, NULL, 0);
+    i2c_io(ISL_I2C_ADDR, NULL, 0, NULL, 0, &data, 1);
     return data;
 }
 
@@ -356,28 +352,25 @@ bool rgb_init() {
     return ret;
 }
 
-uint16_t readRed()
-{
+uint16_t readRed() {
   return read16(RED_L);
 }
 
-uint16_t readGreen()
-{
+uint16_t readGreen() {
   return read16(GREEN_L);
 }
 
-uint16_t readBlue()
-{
+uint16_t readBlue() {
   return read16(BLUE_L);
 }
 
 int main (void) {
     serial_init();
-    serial_write('s');
-    i2c_init();
+    //serial_write('s');
+    /*i2c_init();
     serial_write('t');
     //rgb_init();
-    serial_write('u');
+    serial_write('u');*/
 	for (;;) {
         //serial_write('R');
         //serial_write_uint16(readRed());
@@ -385,7 +378,10 @@ int main (void) {
         serial_write_uint16(readGreen());
         serial_write('B');
         serial_write_uint16(readBlue());*/
-        readRed();
-        _delay_ms(10);
+        //readRed();
+        //_delay_ms(10);
+
+        serial_write_string("HAL, open the pod ");
+        _delay_ms(2000);
 	}
 }

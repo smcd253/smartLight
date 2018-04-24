@@ -12,7 +12,7 @@
 #define BDIV (FOSC/500000-16)/2+1
 #define BAUD_PRESCALE 47
 
-#define ISL_I2C_ADDR 0x44
+#define ISL_I2C_ADDR 0x88
 
 // ISL29125 Registers
 #define DEVICE_ID 0x00
@@ -365,15 +365,19 @@ uint16_t readBlue() {
 }
 
 int main (void) {
+    uint8_t data;
     serial_init();
     //serial_write('s');
-    /*i2c_init();
-    serial_write('t');
-    //rgb_init();
-    serial_write('u');*/
+    i2c_init();
+    //serial_write('t');
+    rgb_init();
+    //serial_write('u');
 	for (;;) {
-        //serial_write('R');
-        //serial_write_uint16(readRed());
+        data = read8(DEVICE_ID);
+        //serial_write_string(" DECIVE_ID:");
+        //serial_write_uint16(data);
+        serial_write('R');
+        serial_write_uint16(readRed());
         /*serial_write('G');
         serial_write_uint16(readGreen());
         serial_write('B');
@@ -381,7 +385,7 @@ int main (void) {
         //readRed();
         //_delay_ms(10);
 
-        serial_write_string("HAL, open the pod ");
-        _delay_ms(2000);
+        //serial_write_string("HAL, open the pod ");
+        _delay_ms(1000);
 	}
 }

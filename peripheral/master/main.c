@@ -16,12 +16,14 @@ void serial_init() {
 
 void serial_write_char_to_peripheral(char c) {
     PORTD |= 1 << PD3;
+    _delay_us(1);
     while ((UCSR0A & (1 << UDRE0)) == 0);
     UDR0 = c;
 }
 
 void serial_write_char_to_monitor(char c) {
     PORTD &= ~(1 << PD3);
+    _delay_us(1);
     while ((UCSR0A & (1 << UDRE0)) == 0);
     UDR0 = c;
 }

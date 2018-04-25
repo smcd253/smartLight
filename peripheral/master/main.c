@@ -26,6 +26,18 @@ void serial_write_char_to_monitor(char c) {
     UDR0 = c;
 }
 
+void send_red(uint8_t c) {
+    serial_write_char_to_peripheral((c & ~(3)) + 0);
+}
+
+void send_green(uint8_t c) {
+    serial_write_char_to_peripheral((c & ~(3)) + 1);
+}
+
+void send_blue(uint8_t c) {
+    serial_write_char_to_peripheral((c & ~(3)) + 2);
+}
+
 int main (void) {
     int i;
     serial_init();
@@ -34,27 +46,27 @@ int main (void) {
 	uint8_t pwmb = 255;
 	for (;;) {
         //serial_write_char_to_monitor('a');
-    	_delay_ms(2000);
+    	_delay_ms(200);
 		// White
-        serial_write_char_to_peripheral((pwmr & ~(3)) + 0);
-        serial_write_char_to_peripheral((pwmg & ~(3)) + 1);
-        serial_write_char_to_peripheral((pwmb & ~(3)) + 2);
+        send_red(pwmr);
+        send_green(pwmg);
+        send_blue(pwmb);
 
-        _delay_ms(2000);
+        _delay_ms(200);
 
         for (i = 0; i < 128; i++) {
+            pwmg--;
         	pwmb--;
-        	pwmg--;
-        	OCR0B = pwmg;
-        	OCR0A = pwmb;
+            send_green(pwmg);
+            send_blue(pwmb);
         	_delay_ms(10);
         }
 
-        _delay_ms(2000);
+        _delay_ms(200);
 
         for (i = 0; i < 127; i++) {
         	pwmb--;
-            serial_write_char_to_peripheral((pwmb & ~(3)) + 2);
+            send_blue(pwmb);
         	_delay_ms(10);
         }
 
@@ -63,17 +75,16 @@ int main (void) {
         for (i = 0; i < 127; i++) {
         	pwmg++;
         	pwmb++;
-            serial_write_char_to_peripheral((pwmg & ~(3)) + 1);
-            serial_write_char_to_peripheral((pwmb & ~(3)) + 2);
+            send_green(pwmg);
+            send_blue(pwmb);
         	_delay_ms(10);
         }
 
         for (i = 0; i < 128; i++) {
         	pwmb++;
-            serial_write_char_to_peripheral((pwmb & ~(3)) + 2);
+            send_blue(pwmb);
         	_delay_ms(10);
         }
-
-        _delay_ms(2000);
+        _delay_ms(200);
 	}
 }

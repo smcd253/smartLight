@@ -12,10 +12,15 @@
 #define BDIV (FOSC/500000-16)/2+1
 #define BAUD_PRESCALE 47
 
-#define ISL_I2C_ADDR 0xA3
+#define RTCLK_I2C_ADDR 0xA3
 #define SEC 0x02
 #define MIN 0x03
 #define HOR 0x04
+
+// current time for initialization
+#define TIME_SEC 0
+#define TIME_MIN 1
+#define TIME_HOR 16
 
 char serial_read() {
     char received_byte;
@@ -186,8 +191,8 @@ nakstop:                                    // Come here to send STOP after a NA
 
 uint8_t read8(uint8_t reg) {
     uint8_t data;
-    i2c_io(ISL_I2C_ADDR, NULL, 0, &reg, 1, NULL, 0);
-    i2c_io(ISL_I2C_ADDR, NULL, 0, NULL, 0, &data, 1);
+    i2c_io(RTCLK_I2C_ADDR, NULL, 0, &reg, 1, NULL, 0);
+    i2c_io(RTCLK_I2C_ADDR, NULL, 0, NULL, 0, &data, 1);
     return data;
 }
 
@@ -195,11 +200,11 @@ uint16_t read16(uint8_t reg) {
     uint8_t array[2];
     array[0] = 2;
     array[1] = 2;
-    if (i2c_io(ISL_I2C_ADDR, NULL, 0, &reg, 1, NULL, 0)) {
+    if (i2c_io(RTCLK_I2C_ADDR, NULL, 0, &reg, 1, NULL, 0)) {
         serial_write_string(" Read16_w failed");
         return 0;
     }
-    if (i2c_io(ISL_I2C_ADDR, NULL, 0, NULL, 0, array, 2)) {
+    if (i2c_io(RTCLK_I2C_ADDR, NULL, 0, NULL, 0, array, 2)) {
         serial_write_string(" Read16_r failed");
         return 0;
     }
@@ -213,7 +218,7 @@ void write8(uint8_t reg, uint8_t data) {
     uint8_t array[2];
     array[0] = reg;
     array[1] = data;
-    if (i2c_io(ISL_I2C_ADDR, NULL, 0, array, 2, NULL, 0)) {
+    if (i2c_io(RTCLK_I2C_ADDR, NULL, 0, array, 2, NULL, 0)) {
         serial_write_string(" Write8 failed");
     }
 }
@@ -222,10 +227,17 @@ int main (void) {
     uint8_t sec, min, hor;
     serial_init();
     i2c_init();
+
+    // initialize clock to correct time
+    // write8(SEC, TIME_SEC);
+    // write8(MIN, TIME_MIN);
+    // write8(HOR, TIME_HOR);
+
 	for (;;) {
         sec = read8(SEC) & ((1 << 6) - 1);
         min = read8(MIN) & ((1 << 6) - 1);
         hor = read8(HOR) & ((1 << 5) - 1);
+
         serial_write_uint16(hor);
         serial_write_string(":");
         serial_write_uint16(min);

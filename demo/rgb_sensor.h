@@ -118,4 +118,6 @@ void serial_init();
 
 void i2c_init();
 
+// void rgb_feedback(void);
+
 #endif

@@ -12,7 +12,7 @@ char redSize;
 uint8_t redSize_int;
 
 // ISR for RGB sensor values
-ISR(TIMER1_OVF_vect){
+ISR(TIMER2_OVF_vect){
     uint8_t data;
     data = read8(DEVICE_ID);
     //serial_write_string(" DECIVE_ID:");
@@ -29,9 +29,8 @@ ISR(TIMER1_OVF_vect){
     a += 1;
     redSize = sizeof(redBuf)/sizeof(redBuf[0]);
     redSize_int = (int)redSize;
-    serial_write('S');
-    serial_write(redSize_int);
-
+    // serial_write('S');
+    // serial_write(redSize_int);
 }
 
 int main (void) {
@@ -40,12 +39,14 @@ int main (void) {
     i2c_init();
     rgb_init();
 
-    // Turn on timer with no prescaler on the clock for fastest
-	// triggering of the interrupt service routine.
-	TCCR1B |= (1 << CS22)|(1 << CS21); // initialize timer with prescaler 256
-	TIMSK1 |= _BV(TOIE1);
+    serial_write('Begining of Main');
+    // // Turn on timer2 with 1024 prescaler
+    // use timer2 so as not to interfere with pwm
+	TCCR2B |= (1 << CS20)|(1 << CS22); // initialize timer with prescaler 1024
+    TIMSK2 |= _BV(TOIE2); // enable timer overflow signal
 
-    // enable interupts
+
+    // // enable interupts
     sei();
 
 	for (;;) {

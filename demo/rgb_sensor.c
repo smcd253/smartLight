@@ -2,8 +2,8 @@
 #include <avr/interrupt.h>
 #include <stdbool.h>
 #include <util/delay.h>
-#include "rgb_sensor.h"
 
+#include "rgb_sensor.h"
 
 
 char serial_read() {
@@ -272,3 +272,18 @@ uint16_t readGreen() {
 uint16_t readBlue() {
   return read16(BLUE_L);
 }
+
+// void rgb_feedback(){
+//     uint8_t data;
+//     char redSize;
+//     int redSize_int;
+//     int a = 0;
+//     // rgb feedback
+//     data = read8(DEVICE_ID);
+//     redBuf[a] = 1;
+//     a += 1;
+//     redSize = sizeof(redBuf)/sizeof(redBuf[0]);
+//     redSize_int = (uint8_t)redSize;
+//     serial_write('S');
+//     serial_write(redSize_int);
+// }

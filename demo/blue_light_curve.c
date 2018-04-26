@@ -7,6 +7,7 @@
 #include <util/delay.h>
 
 #include "blue_light_curve.h"
+#include "rgb_sensor.h"
 
 void init_pwm(){
 	/**
@@ -49,51 +50,63 @@ void blue_light_curve(){
     _delay_ms(2000);
     // dim blue
     for (i = 0; i < 128; i++) {
+        cli();
         pwmb--;
         OCR0A = pwmb;
+        sei();
         _delay_ms(10);
     }
 
     _delay_ms(2000);
     // dim green and blue
     for (i = 0; i < 127; i++) {
+        cli();
         pwmb--;
         pwmg--;
         OCR0B = pwmg;
         OCR0A = pwmb;
+        sei();
         _delay_ms(10);
     }
 
     _delay_ms(2000);
     // dim green
     for (i = 0; i < 128; i++) {
+        cli();
         pwmg--;
         OCR0B = pwmg;
+        sei();
         _delay_ms(10);
     }
 
     _delay_ms(2000);
     // brighten green
     for (i = 0; i < 128; i++) {
+        cli();
         pwmg++;
         OCR0B = pwmg;
+        sei();
         _delay_ms(10);
     }
 
     _delay_ms(2000);
     // brighten green and blue
     for (i = 0; i < 127; i++) {
+        cli();
         pwmg++;
         pwmb++;
         OCR0B = pwmg;
         OCR0A = pwmb;
+        sei();
         _delay_ms(10);
     }
 
     // brighten blue
     for (i = 0; i < 128; i++) {
+        cli();
         pwmb++;
         OCR0A = pwmb;
+        sei();
         _delay_ms(10);
     }
 }

@@ -246,7 +246,7 @@ bool rgb_init() {
     uint8_t data = 0x00;
     bool ret = true;
     data = read8(DEVICE_ID);
-    serial_write_string(" DECIVE_ID:");
+    serial_write_string("DEVICE_ID:");
     serial_write_uint16(data);
     if (data != 0x7D) {
         //ret &= false;
@@ -257,7 +257,7 @@ bool rgb_init() {
     serial_write_string(" Reset");
     // Set to RGB mode, 10k lux, and high IR compensation
     ret &= config(CFG1_MODE_RGB | CFG1_10KLUX, CFG2_IR_ADJUST_HIGH, CFG_DEFAULT);
-    serial_write_string(" Configed");
+    serial_write_string("Config");
     return ret;
 }
 

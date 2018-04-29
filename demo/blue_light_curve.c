@@ -9,6 +9,7 @@
 #include "blue_light_curve.h"
 #include "rgb_sensor.h"
 
+
 void init_pwm(){
 	/**
 	 * We will be using OCR1A as our PWM output which is the
@@ -33,6 +34,20 @@ void init_pwm(){
 	TCCR1B |= _BV(CS10) | _BV(WGM12);
     TCCR0A |= _BV(COM0A1) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
 	TCCR0B |= _BV(CS00);
+
+    // set initial colors
+    // {red, green, blue}
+    pwm_day[0] = 255;
+    pwm_day[1] = 255;
+    pwm_day[2] = 255;
+    
+    pwm_evening[0] = 255;
+    pwm_evening[1] =  128;
+    pwm_evening[2] = 0;
+
+    pwm_night[0] = 0;
+    pwm_night[1] = 0;
+    pwm_night[2] = 0;
 }
 
 void blue_light_curve(){
@@ -110,3 +125,68 @@ void blue_light_curve(){
         _delay_ms(10);
     }
 }
+
+// bool transitioning = false;
+// bool transition_finished = false;
+
+
+// // void brite(uint8_t* pwm_target){
+
+// // }
+// // takes in time[3] by reference and outputs the proper pwm values
+// void pwm_curve(uint8_t* time){
+//     bool daytime = (
+//                     (time[0] >= WAKEUP_HOR) && (time[0] < DIM_HOR)
+//                     && (time[1] >= WAKEUP_MIN) && (time[1] < DIM_MIN)
+//                     );
+//     bool evening = (
+//                     (time[0] >= DIM_HOR) && (time[0] < SLEEP_HOR)
+//                     && (time[1] >= DIM_MIN) && (time[1] < SLEEP_MIN)
+//                     );
+//     bool sleep = (
+//                     ((time[0] >= SLEEP_HOR) && (time[0] < 0)
+//                     && (time[1] >= SLEEP_MIN) && (time[1] < 0))
+//                     || 
+//                     ((time[0] >= 0) && (time[0] < WAKEUP_HOR)
+//                     && (time[1] >= 0) && (time[1] < WAKEUP_MIN))
+//                     );
+//     if (daytime){
+//         // set target pwm values
+//         if(!transitioning && !transition_finished){
+//             pwm_target = pwm_day;
+//             transitioning = true;
+//         }
+//         else if (transitioning && !transition_finished){
+//             // brite(pwm_target); // should output transition_finished true when done
+//         }
+//         else if (transitioning && transition_finished){
+//             transition_finished = true;
+//         }
+//     }
+//     else if (evening){
+//         // set target pwm values
+//         if(!transitioning && !transition_finished){
+//             pwm_target = pwm_evening;
+//             transitioning = true;
+//         }
+//         else if (transitioning && !transition_finished){
+//             // dim(pwm_target); // should output transition_finished true when done
+//         }
+//         else if (transitioning && transition_finished){
+//             transition_finished = true;
+//         }
+//     }
+//     else if (sleep){
+//         // set target pwm values
+//         if(!transitioning && !transition_finished){
+//             pwm_target = pwm_night;
+//             transitioning = true;
+//         }
+//         else if (transitioning && !transition_finished){
+//             // dim(pwm_target); // should output transition_finished true when done
+//         }
+//         else if (transitioning && transition_finished){
+//             transition_finished = true;
+//         }
+//     }
+// }                

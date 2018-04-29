@@ -4,9 +4,20 @@
 #include <avr/io.h>
 
 // global variables
-volatile uint8_t pwmr;
-volatile uint8_t pwmg;
-volatile uint8_t pwmb;
+volatile uint8_t pwmr, pwmg, pwmb;
+volatile uint8_t *pwm_day;
+volatile uint8_t *pwm_evening;
+volatile uint8_t *pwm_night;
+volatile uint8_t* pwm_target;
+
+// pwm states
+enum CURVE_STATE{
+    day,
+    evening,
+    night
+} cState;
+
+
 
 // function definitions
 

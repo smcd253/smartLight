@@ -52,5 +52,4 @@ void readTime(uint8_t* _time){
     _time[2] = read8_clk(SEC) & ((1 << 6) - 1);
     _time[1] = read8_clk(MIN) & ((1 << 6) - 1);
     _time[0] = read8_clk(HOR) & ((1 << 5) - 1);
-    serial_write_string(" end of readTime()");
 }

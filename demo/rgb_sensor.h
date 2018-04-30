@@ -101,6 +101,12 @@
 
 // function declarations
 
+uint8_t read8(uint8_t reg);
+
+uint16_t read16(uint8_t reg);
+
+void write8(uint8_t reg, uint8_t data);
+
 bool reset();
 
 bool config(uint8_t config1, uint8_t config2, uint8_t config3);

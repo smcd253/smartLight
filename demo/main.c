@@ -6,7 +6,7 @@
 #include "i2c.h"
 #include "rgb_sensor.h"
 #include "blue_light_curve.h"
-#include "time.h"
+#include "realtime.h"
 
 int a = 0;
 char redSize;

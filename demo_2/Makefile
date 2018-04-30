@@ -1,7 +1,7 @@
 DEVICE     = atmega328p
 CLOCK      = 9830400
 PROGRAMMER = -c usbtiny -P usb
-OBJECTS    = serial.o i2c.o rgb.o realtime.o main.o
+OBJECTS    = serial.o i2c.o rgb.o realtime.o pwm.o signal_processing.o main.o
 FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0xe0:m
 
 # blue_light_curve.o time.o

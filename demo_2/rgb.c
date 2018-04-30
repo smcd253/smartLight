@@ -80,7 +80,7 @@ bool rgb_init() {
     bool ret = true;
     data = read8(DEVICE_ID);
     serial_write_string("DEVICE_ID:");
-    // serial_write_uint16(data);
+    serial_write_uint16(data);
     if (data != 0x7D) {
         //ret &= false;
         serial_write_string(" data!=0x7D");
@@ -105,6 +105,22 @@ uint16_t readGreen() {
 uint16_t readBlue() {
   return read16(BLUE_L);
 }
+
+// void rgb_feeback(uint8_t *pwmr_act, uint8_t *pwmg_act, uint *pwmb_act,
+//                 uint8_t *pwmr, uint8_t *pwmg, uint8_t *pwmb
+//                 uint16_t *redAvg, uint16_t *greenAvg, uint16_t *blueAvg){
+//     // scale averages to 255 scale for pwm
+//     int scaledRed = (int)(((double)redAvg/65536) * 255);
+//     int scaledGreen = (int)(((double)greenAvg/65536) * 255);
+//     int scaledBlue = (int)(((double)redBlue/65536) * 255);
+    
+//     serial_write('R');
+//     serial_write_uint16(scaledRed);
+//     serial_write('G');
+//     serial_write_uint16(scaledGreen);
+//     serial_write('B');
+//     serial_write_uint16(scaledBlue);
+// }
 
 // void rgb_feedback(){
 //     uint8_t data;

@@ -56,9 +56,9 @@ int main (void) {
         greenAvg = (uint16_t)(greenTot/BUF_SIZE);
         blueAvg = (uint16_t)(blueTot/BUF_SIZE);
 
-        int scaledRed = (int)(((double)redAvg/65536) * 255);
-        int scaledGreen = (int)(((double)greenAvg/65536) * 255);
-        int scaledBlue = (int)(((double)blueAvg/65536) * 255);
+        uint8_t scaledRed = (uint8_t)(((double)redAvg/65536) * 255);
+        uint8_t scaledGreen = (uint8_t)(((double)greenAvg/65536) * 255);
+        uint8_t scaledBlue = (uint8_t)(((double)blueAvg/65536) * 255);
 
         // serial_write('R');
         // serial_write_uint16(scaledRed);
@@ -66,39 +66,45 @@ int main (void) {
         // serial_write_uint16(scaledGreen);
         // serial_write('B');
         // serial_write_uint16(scaledBlue);
-
-        // pwm
+        
         pwm_curve(timeNow, pwm_target);
-        // serial_write_uint16((uint16_t)pwm_target[0]);
-        if(pwm_act[0] < pwm_target[0] - PWM_LIMIT){
-            if(n < PWM_LIMIT){
-                pwm_act[0] += 1;
-                n++;                
-            }
-            else{
-                n = 0;
-            }
-            // serial_write_string("too low");
-        }
-        else if (pwm_act[0] > pwm_target[0] + PWM_LIMIT){
-            if(n < PWM_LIMIT){
-                pwm_act[0] -= 1;
-                n++;                
-            }
-            else{
-                n = 0;
-            }
-            // serial_write_string("too high");
+        // pwm attempt2 TO TRY TOMORROW
+        if (scaledRed < pwm_target[0])
+            pwm_act[0] = (uint8_t)(((double)scaledRed/(double)pwm_target[0]) * 255);
+        else
+            pwm_act[0] = pwm_target[0];
             
-        }
-        else{
-            if(scaledRed > pwm_target[0] + PWM_BUF)
-                pwm_act[0] -= 1;            
-            else if (scaledRed < pwm_target[0] - PWM_BUF)
-                pwm_act[0] += 1;
-            // serial_write_string("control");
+        // pwm attempt1
+        // // serial_write_uint16((uint16_t)pwm_target[0]);
+        // if(pwm_act[0] < pwm_target[0] - PWM_LIMIT){
+        //     if(n < PWM_LIMIT){
+        //         pwm_act[0] += 1;
+        //         n++;                
+        //     }
+        //     else{
+        //         n = 0;
+        //     }
+        //     // serial_write_string("too low");
+        // }
+        // else if (pwm_act[0] > pwm_target[0] + PWM_LIMIT){
+        //     if(n < PWM_LIMIT){
+        //         pwm_act[0] -= 1;
+        //         n++;                
+        //     }
+        //     else{
+        //         n = 0;
+        //     }
+        //     // serial_write_string("too high");
             
-        }
+        // }
+        // else{
+        //     if(scaledRed > pwm_target[0] + PWM_BUF)
+        //         pwm_act[0] -= 1;            
+        //     else if (scaledRed < pwm_target[0] - PWM_BUF)
+        //         pwm_act[0] += 1;
+        //     // serial_write_string("control");
+            
+        // }
         // serial_write_uint16((uint16_t)pwm_act[0]);
         
         OCR1A = pwm_act[0];

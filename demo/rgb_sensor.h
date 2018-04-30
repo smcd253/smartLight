@@ -106,27 +106,6 @@ volatile uint16_t blueAvg;
 
 // function declarations
 
-char serial_read();
-
-void serial_write(char c);
-
-void serial_write_uint16(uint16_t n);
-
-void serial_write_string(char* s);
-
-void serial_init();
-
-void i2c_init();
-
-uint8_t i2c_io(uint8_t device_addr, uint8_t *ap, uint16_t an, 
-               uint8_t *wp, uint16_t wn, uint8_t *rp, uint16_t rn);
-
-uint8_t read8(uint8_t reg);
-
-uint16_t read16(uint8_t reg);
-
-void write8(uint8_t reg, uint8_t data);
-
 bool reset();
 
 bool config(uint8_t config1, uint8_t config2, uint8_t config3);

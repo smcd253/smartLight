@@ -1,9 +1,9 @@
 #include <avr/io.h>
-#include <avr/interrupt.h>
 #include <stdbool.h>
 #include <util/delay.h>
-#include <util/atomic.h>
 
+#include "serial.h"
+#include "i2c.h"
 #include "rgb_sensor.h"
 #include "blue_light_curve.h"
 #include "time.h"
@@ -36,13 +36,15 @@ uint8_t redSize_int;
 
 int main (void) {    
     init_pwm();
+    _delay_ms(1000);
     serial_init();
+    _delay_ms(1000);
     i2c_init();
+    _delay_ms(1000);
     rgb_init();
 
     uint8_t* timeNow;
     
-    serial_write_string("fail here");
 	for (;;) {
         timeNow = readTime();
 
@@ -52,6 +54,8 @@ int main (void) {
         serial_write_string(":");
         serial_write_uint16(timeNow[2]);
         serial_write_string("    ");
+
+
         _delay_ms(1000);
 	}
 }

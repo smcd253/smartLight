@@ -40,82 +40,85 @@ void init_pwm(){
 }
 
 // takes in _time[3] by reference and outputs the proper pwm values
+uint8_t i = 0;
+bool transition_finished = false;
+bool transition_reset = false;
+bool daytime = false, evening = false, sleep = false;
 void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
-    bool daytime = false, evening = false, sleep = false;
-    bool transition = false;
-
-    if (_time[0] >= WAKEUP_HOR & ~daytime){
-        if (_time[1] >= DIM_MIN){
+    if ((_time[0] >= WAKEUP_HOR) && (_time[0] < DIM_HOR)){
+        daytime = true;
+        if ((_time[1] < WAKEUP_MIN) && (_time[0] == WAKEUP_HOR)){
             daytime = false;
-            serial_write_string("daytime false");
         }
     }
 
     if ((_time[0] >= DIM_HOR) && (_time[0] < SLEEP_HOR)){
         evening = true;
-        if (~((_time[1] >= DIM_MIN) && (_time[1] < SLEEP_MIN))){
+        if ((_time[1] < DIM_MIN) && (_time[0] == DIM_HOR)){
             evening = false;
         }
     }
 
     if ((_time[0] >= SLEEP_HOR) && (_time[0] < 0)){
         sleep = true;
-        if (~((_time[1] >= SLEEP_MIN) && (_time[1] < 0))){
+        if ((_time[1] < SLEEP_MIN) && (_time[0] == SLEEP_HOR)){
             sleep = false;
         }
     }
     else if ((_time[0] >= 0) && (_time[0] < WAKEUP_HOR)){
         sleep = true;
-        if (~((_time[1] >= 0) && (_time[1] < WAKEUP_MIN))){
+        if ((_time[1] < SLEEP_MIN) && (_time[0] == 0)){
             sleep = false;
         }
     }
 
     if (daytime){
+        if (!transition_reset){
+            transition_reset = true;
+            transition_finished = false;
+        }
         // set target pwm values
-        // if (!transition){
-        //     uint8_t i;
-        //     if (pwm_act[0] < pwm_target[0]){
-        //         for (i = pwm_act[0]; i < pwm_target[0]; i++){
-        //             pwm_act[0] = i;
-        //             _delay_ms(10);
-        //         }
-        //     }
-        //     else if(pwm_act[0] < pwm_target[0])
-            
-        //     transition = false;
-        // }
+        if (!transition_finished){
+            if (pwm_act[0] < pwm_target[0]){
+                if (i < pwm_target[0]){
+                    pwm_act[0] = i;
+                    _delay_ms(10);
+                    i++;
+                }
+                else{
+                    i = 0;
+                    transition_finished = true;
+                    transition_reset = true;   
+                }
+            }
+            else if(pwm_act[0] > pwm_target[0]){
+                if (i > pwm_target[0]){
+                    pwm_act[0] = i;
+                    _delay_ms(10);
+                    i--;
+                }
+                else{
+                    i = 0;
+                    transition_finished = true;
+                    transition_reset = true;     
+                }
+            }
+        }
         pwm_target[0] = pwm_day[0];
         pwm_target[1] = pwm_day[1];
         pwm_target[2] = pwm_day[2];
+    }
+    else if (evening){  
+        if (!transition_reset){
+            transition_reset = true;
+            transition_finished = false;
+        }
         
     }
-    else if (evening){
-        // set target pwm values
-        // if(!transitioning && !transition_finished){
-        //     pwm_target = pwm_evening;
-        //     transitioning = true;
-        // }
-        // else if (transitioning && !transition_finished){
-        //     // dim(pwm_target); // should output transition_finished true when done
-        // }
-        // else if (transitioning && transition_finished){
-        //     transition_finished = true;
-        // }
-        pwm_target = pwm_evening;
-    }
-    else if (sleep){
-        // // set target pwm values
-        // if(!transitioning && !transition_finished){
-        //     pwm_target = pwm_night;
-        //     transitioning = true;
-        // }
-        // else if (transitioning && !transition_finished){
-        //     // dim(pwm_target); // should output transition_finished true when done
-        // }
-        // else if (transitioning && transition_finished){
-        //     transition_finished = true;
-        // }
-        pwm_target = pwm_night;
+    else if (sleep){  
+        if (!transition_reset){
+            transition_reset = true;
+            transition_finished = false;
+        }
     }
 }                

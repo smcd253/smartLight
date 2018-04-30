@@ -2,11 +2,11 @@
 #define BLUE_LIGHT_CURVE_H
 
 // pwm states
-enum CURVE_STATE{
-    day,
-    evening,
-    night
-} cState;
+// enum CURVE_STATE{
+//     day,
+//     evening,
+//     night
+// } cState;
 
 
 

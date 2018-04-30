@@ -33,6 +33,12 @@ int main (void) {
     int n;
 	for (;;) {
         readTime(timeNow);
+        // serial_write_uint16(timeNow[0]);
+        // serial_write_string(":");
+        // serial_write_uint16(timeNow[1]);
+        // serial_write_string(":");
+        // serial_write_uint16(timeNow[2]);
+        // serial_write_string("    ");
 
         uint16_t red = readRed();
         uint16_t green = readGreen();
@@ -64,38 +70,30 @@ int main (void) {
         /*************** ADAPTIVE PWM **********************/
         pwm_curve(timeNow, pwm_act, pwm_target);
         // pwm attempt2 TO TRY TOMORROW
-        serial_write_uint16(scaledRed);
-        if (scaledRed < pwm_target[0]){
-            uint8_t start = pwm_act[0];
-            //uint8_t end = (uint8_t)(((double)scaledRed/(double)pwm_target[0]) * 255);
-            uint8_t end = scaledRed;
+        // serial_write_uint16(scaledRed);
+        // if (scaledRed < pwm_target[0]){
+        //     uint8_t start = pwm_act[0];
+        //     //uint8_t end = (uint8_t)(((double)scaledRed/(double)pwm_target[0]) * 255);
+        //     uint8_t end = scaledRed;
 
-            uint8_t i;
-            // gradualy bring pwm_act to scaledRed
-            for (i = start; i < end; i++){
-                pwm_act[0] = i;
-                OCR1A = pwm_act[0];
-                send_red(pwm_act[0]);
+        //     uint8_t i;
+        //     // gradualy bring pwm_act to scaledRed
+        //     for (i = start; i < end; i++){
+        //         pwm_act[0] = i;
+        //         OCR1A = pwm_act[0];
+        //         send_red(pwm_act[0]);
 
-                _delay_ms(5);
-            }
-        }
+        //         _delay_ms(5);
+        //     }
+        // }
             
-        else
+        // else
             pwm_act[0] = pwm_target[0];
         
 
         /*************** SEND PWM DATA TO PERIPH BOARD **********************/
         send_red(pwm_act[0]);
         OCR1A = pwm_act[0];
-
-
-        // serial_write_uint16(timeNow[0]);
-        // serial_write_string(":");
-        // serial_write_uint16(timeNow[1]);
-        // serial_write_string(":");
-        // serial_write_uint16(timeNow[2]);
-        // serial_write_string("    ");
 
         //_delay_ms(1000);*/
         _delay_ms(100);

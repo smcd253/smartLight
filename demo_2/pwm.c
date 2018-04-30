@@ -13,6 +13,18 @@ uint8_t pwm_day[3] = {255, 255, 255};
 uint8_t pwm_evening[3] = {255, 128, 0};
 uint8_t pwm_night[3] = {0, 0, 0};
 
+bool awake = false;
+uint8_t pir_timer = 0;
+
+void pir_init() {
+	DDRC &= ~(1 << PC3);
+	PORTC &= ~(1 << PC3);  
+}
+
+bool pir_is_on() {
+	return (PINC & (1 << PC3)) != 0;
+}
+
 void init_pwm(){
 	/**
 	 * We will be using OCR1A as our PWM output which is the
@@ -40,85 +52,156 @@ void init_pwm(){
 }
 
 // takes in _time[3] by reference and outputs the proper pwm values
-uint8_t i = 0;
-bool transition_finished = false;
-bool transition_reset = false;
 bool daytime = false, evening = false, sleep = false;
+uint8_t oldSec;
 void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
-    if ((_time[0] >= WAKEUP_HOR) && (_time[0] < DIM_HOR)){
+    // if ((_time[0] >= WAKEUP_HOR) && (_time[0] < DIM_HOR)){
+    //     daytime = true;
+    //     if ((_time[1] < WAKEUP_MIN) && (_time[0] == WAKEUP_HOR)){
+    //         daytime = false;
+    //     }
+    // }
+
+    // if ((_time[0] >= DIM_HOR) && (_time[0] < SLEEP_HOR)){
+    //     evening = true;
+    //     if ((_time[1] < DIM_MIN) && (_time[0] == DIM_HOR)){
+    //         evening = false;
+    //     }
+    // }
+
+    // if ((_time[0] >= SLEEP_HOR) && (_time[0] < 0)){
+    //     sleep = true;
+    //     if ((_time[1] < SLEEP_MIN) && (_time[0] == SLEEP_HOR)){
+    //         sleep = false;
+    //     }
+    // }
+    // else if ((_time[0] >= 0) && (_time[0] < WAKEUP_HOR)){
+    //     sleep = true;
+    //     if ((_time[1] < SLEEP_MIN) && (_time[0] == 0)){
+    //         sleep = false;
+    //     }
+    // }
+
+    if ((_time[2] >= 00) && (_time[2] < 20)){
         daytime = true;
-        if ((_time[1] < WAKEUP_MIN) && (_time[0] == WAKEUP_HOR)){
-            daytime = false;
-        }
+        evening = false;
+        sleep = false;
     }
-
-    if ((_time[0] >= DIM_HOR) && (_time[0] < SLEEP_HOR)){
+    else if ((_time[2] >= 20) && (_time[2] < 40)){
+        daytime = false;
         evening = true;
-        if ((_time[1] < DIM_MIN) && (_time[0] == DIM_HOR)){
-            evening = false;
-        }
+        sleep = false;
     }
-
-    if ((_time[0] >= SLEEP_HOR) && (_time[0] < 0)){
+    else if ((_time[2] >= 40) && (_time[2] < 59)){
+        daytime = false;
+        evening = false;
         sleep = true;
-        if ((_time[1] < SLEEP_MIN) && (_time[0] == SLEEP_HOR)){
-            sleep = false;
-        }
     }
-    else if ((_time[0] >= 0) && (_time[0] < WAKEUP_HOR)){
-        sleep = true;
-        if ((_time[1] < SLEEP_MIN) && (_time[0] == 0)){
-            sleep = false;
-        }
-    }
-
     if (daytime){
-        if (!transition_reset){
-            transition_reset = true;
-            transition_finished = false;
-        }
-        // set target pwm values
-        if (!transition_finished){
-            if (pwm_act[0] < pwm_target[0]){
-                if (i < pwm_target[0]){
-                    pwm_act[0] = i;
-                    _delay_ms(10);
-                    i++;
-                }
-                else{
-                    i = 0;
-                    transition_finished = true;
-                    transition_reset = true;   
-                }
-            }
-            else if(pwm_act[0] > pwm_target[0]){
-                if (i > pwm_target[0]){
-                    pwm_act[0] = i;
-                    _delay_ms(10);
-                    i--;
-                }
-                else{
-                    i = 0;
-                    transition_finished = true;
-                    transition_reset = true;     
-                }
-            }
-        }
         pwm_target[0] = pwm_day[0];
         pwm_target[1] = pwm_day[1];
         pwm_target[2] = pwm_day[2];
+
+        // set target pwm values
+
+        pwm_act[0] = (_time[2]*pwm_day[0])/10;
+        pwm_act[1] = (_time[2]*pwm_day[1])/10;
+        pwm_act[2] = (_time[2]*pwm_day[2])/10;
+        
+        // if (_time[2] != oldSec){
+        //     if (pwm_act[0] < pwm_target[0]){
+        //         pwm_act[0] += 20;
+        //     }
+        //     else if(pwm_act[0] > pwm_target[0]){
+        //         pwm_act[0] -= 20;
+        //     }
+        //     if (pwm_act[1] < pwm_target[1]){
+        //         pwm_act[1] += 20;
+        //     }
+        //     else if(pwm_act[1] > pwm_target[1]){
+        //         pwm_act[1] -= 20;
+        //     }
+        //     if (pwm_act[2] < pwm_target[2]){
+        //         pwm_act[2] += 20;
+        //     }
+        //     else if(pwm_act[2] > pwm_target[2]){
+        //     }
+        // }
     }
     else if (evening){  
-        if (!transition_reset){
-            transition_reset = true;
-            transition_finished = false;
-        }
         
+        pwm_target[0] = pwm_evening[0];
+        pwm_target[1] = pwm_evening[1];
+        pwm_target[2] = pwm_evening[2];
+
+        pwm_act[0] = ((_time[2] - 20)*pwm_day[0] + ((30 - _time[2]) * pwm_evening[0]))/10;
+        pwm_act[1] = ((_time[2] - 20)*pwm_day[1] + ((30 - _time[2]) * pwm_evening[1]))/10;
+        pwm_act[2] = ((_time[2] - 20)*pwm_day[2] + ((30 - _time[2]) * pwm_evening[2]))/10;
+
+        // // set target pwm values
+        // if (_time[2] != oldSec){
+        //     if (pwm_act[0] < pwm_target[0]){
+        //         pwm_act[0] += 20;
+        //     }
+        //     else if(pwm_act[0] > pwm_target[0]){
+        //         pwm_act[0] -= 20;
+        //     }
+        //     if (pwm_act[1] < pwm_target[1]){
+        //         pwm_act[1] += 20;
+        //     }
+        //     else if(pwm_act[1] > pwm_target[1]){
+        //         pwm_act[1] -= 20;
+        //     }
+        //     if (pwm_act[2] < pwm_target[2]){
+        //         pwm_act[2] += 20;
+        //     }
+        //     else if(pwm_act[2] > pwm_target[2]){
+        //     }
+        // }
     }
-    else if (sleep){  
-        if (!transition_reset){
-            transition_reset = true;
-            transition_finished = false;
+    else if (sleep){
+        if (pir_is_on()){
+            awake = true;
         }
+        if (awake){
+            pwm_target[0] = pwm_evening[0];
+            pwm_target[1] = pwm_evening[1];
+            pwm_target[2] = pwm_evening[2];
+            pir_timer++;
+            if (pir_timer >= 30){
+                awake = false;
+            }
+        }
+        else{
+            pwm_target[0] = pwm_night[0];
+            pwm_target[1] = pwm_night[1];
+            pwm_target[2] = pwm_night[2];
+        }
+
+        pwm_act[0] = ((_time[2] - 40)*pwm_evening[0] + ((50 - _time[2]) * pwm_night[0]))/10;
+        pwm_act[1] = ((_time[2] - 40)*pwm_evening[1] + ((50 - _time[2]) * pwm_night[1]))/10;
+        pwm_act[2] = ((_time[2] - 40)*pwm_evening[2] + ((50 - _time[2]) * pwm_night[2]))/10;
+
+        // // set target pwm values
+        // if (_time[2] != oldSec){
+        //     if (pwm_act[0] < pwm_target[0]){
+        //         pwm_act[0] += 20;
+        //     }
+        //     else if(pwm_act[0] > pwm_target[0]){
+        //         pwm_act[0] -= 20;
+        //     }
+        //     if (pwm_act[1] < pwm_target[1]){
+        //         pwm_act[1] += 20;
+        //     }
+        //     else if(pwm_act[1] > pwm_target[1]){
+        //         pwm_act[1] -= 20;
+        //     }
+        //     if (pwm_act[2] < pwm_target[2]){
+        //         pwm_act[2] += 20;
+        //     }
+        //     else if(pwm_act[2] > pwm_target[2]){
+        //     }
+        // }
     }
+    oldSec = _time[2];
 }                

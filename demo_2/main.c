@@ -9,9 +9,6 @@
 #include "realtime.h"
 #include "signal_processing.h"
 
-#define PWM_BUF 20
-#define PWM_LIMIT 80
-
 int a = 0;
 char redSize;
 uint8_t redSize_int;
@@ -19,7 +16,24 @@ uint8_t redSize_int;
 uint8_t pwm_act[3];
 uint8_t pwm_target[3];
 
+uint8_t scaledRed;
+uint8_t scaledGreen;
+uint8_t scaledBlue;
 
+void setRed(){
+    OCR1A = pwm_act[0];
+    send_red(pwm_act[0]);
+}
+
+void setGreen(){
+    OCR0B = pwm_act[1];
+    send_green(pwm_act[1]);
+}
+
+void setBlue(){
+    OCR0A = pwm_act[2];
+    send_blue(pwm_act[2]);
+}
 int main (void) {    
     init_pwm();
     serial_init();
@@ -33,12 +47,12 @@ int main (void) {
     int n;
 	for (;;) {
         readTime(timeNow);
-        // serial_write_uint16(timeNow[0]);
-        // serial_write_string(":");
-        // serial_write_uint16(timeNow[1]);
-        // serial_write_string(":");
-        // serial_write_uint16(timeNow[2]);
-        // serial_write_string("    ");
+        serial_write_uint16(timeNow[0]);
+        serial_write_string(":");
+        serial_write_uint16(timeNow[1]);
+        serial_write_string(":");
+        serial_write_uint16(timeNow[2]);
+        serial_write_string("    ");
 
         uint16_t red = readRed();
         uint16_t green = readGreen();
@@ -57,43 +71,71 @@ int main (void) {
             redTot += (uint32_t)redBuf[i];
             greenTot += (uint32_t)greenBuf[i];
             blueTot += (uint32_t)blueBuf[i];
-
         }
         redAvg = (uint16_t)(redTot/BUF_SIZE);
         greenAvg = (uint16_t)(greenTot/BUF_SIZE);
         blueAvg = (uint16_t)(blueTot/BUF_SIZE);
 
-        uint8_t scaledRed = (uint8_t)(((double)redAvg/65536) * 255);
-        uint8_t scaledGreen = (uint8_t)(((double)greenAvg/65536) * 255);
-        uint8_t scaledBlue = (uint8_t)(((double)blueAvg/65536) * 255);
+        scaledRed = (uint8_t)(redAvg/257);
+        scaledGreen = (uint8_t)(greenAvg/257);
+        scaledBlue = (uint8_t)(blueAvg/257);
         
         /*************** ADAPTIVE PWM **********************/
         pwm_curve(timeNow, pwm_act, pwm_target);
         // pwm attempt2 TO TRY TOMORROW
-        // serial_write_uint16(scaledRed);
-        // if (scaledRed < pwm_target[0]){
-        //     uint8_t start = pwm_act[0];
-        //     //uint8_t end = (uint8_t)(((double)scaledRed/(double)pwm_target[0]) * 255);
-        //     uint8_t end = scaledRed;
 
-        //     uint8_t i;
-        //     // gradualy bring pwm_act to scaledRed
-        //     for (i = start; i < end; i++){
-        //         pwm_act[0] = i;
-        //         OCR1A = pwm_act[0];
-        //         send_red(pwm_act[0]);
+        if (scaledRed > pwm_target[0]/2){
+            uint8_t start = pwm_act[0];
+            uint8_t end = pwm_target[0]/2;
 
-        //         _delay_ms(5);
-        //     }
-        // }
-            
-        // else
+            uint8_t i;
+            // gradualy bring pwm_act to scaledRed
+            for (i = start; i > end; i--){
+                pwm_act[0] = i;
+                setRed();
+                _delay_ms(20);
+            }
+        }   
+        else{
             pwm_act[0] = pwm_target[0];
-        
+        }
+
+        if (scaledGreen > pwm_target[1]/2){
+            uint8_t start = pwm_act[1];
+            uint8_t end = pwm_target[1]/2;
+
+            uint8_t i;
+            // gradualy bring pwm_act to scaledGreen
+            for (i = start; i > end; i--){
+                pwm_act[1] = i;
+                setGreen();
+                _delay_ms(20);
+            }
+        }   
+        else{
+            pwm_act[1] = pwm_target[1];
+        }
+            
+        if (scaledBlue > pwm_target[2]/2){
+            uint8_t start = pwm_act[2];
+            uint8_t end = pwm_target[2]/2;
+
+            uint8_t i;
+            // gradualy bring pwm_act to scaledRed
+            for (i = start; i > end; i--){
+                pwm_act[2] = i;
+                setBlue();
+                _delay_ms(20);
+            }
+        }   
+        else{
+            pwm_act[2] = pwm_target[2];
+        }
 
         /*************** SEND PWM DATA TO PERIPH BOARD **********************/
-        send_red(pwm_act[0]);
-        OCR1A = pwm_act[0];
+        setRed();
+        setGreen();
+        setBlue();
 
         //_delay_ms(1000);*/
         _delay_ms(100);

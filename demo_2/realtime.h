@@ -14,16 +14,16 @@ TODO: 1. make a general i2c script and header file
 
 // alarm info
 #define WAKEUP_MIN 00
-#define WAKEUP_HOR 06
-#define DIM_MIN 00
-#define DIM_HOR 20
-#define SLEEP_MIN 00
-#define SLEEP_HOR 22
+#define WAKEUP_HOR 16
+#define DIM_MIN 01
+#define DIM_HOR 16
+#define SLEEP_MIN 02
+#define SLEEP_HOR 16
 
 // current time for initialization
 #define TIME_SEC 0
 #define TIME_MIN 0
-#define TIME_HOR 12
+#define TIME_HOR 16
 
 void init_rtclk(void);
 

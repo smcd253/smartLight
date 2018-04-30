@@ -39,121 +39,51 @@ void init_pwm(){
 	TCCR0B |= _BV(CS00);
 }
 
-// void blue_light_curve(){
-//     int i;
-
-//     // pwmx = 255 --> WHITE
-//     pwmr = 255;
-//     pwmg = 255;
-//     pwmb = 255;
-    
-//     OCR1A = pwmr;
-//     OCR0B = pwmg;
-//     OCR0A = pwmb;
-
-//     _delay_ms(2000);
-//     // dim blue
-//     for (i = 0; i < 128; i++) {
-//         cli();
-//         pwmb--;
-//         OCR0A = pwmb;
-//         sei();
-//         _delay_ms(10);
-//     }
-
-//     _delay_ms(2000);
-//     // dim green and blue
-//     for (i = 0; i < 127; i++) {
-//         cli();
-//         pwmb--;
-//         pwmg--;
-//         OCR0B = pwmg;
-//         OCR0A = pwmb;
-//         sei();
-//         _delay_ms(10);
-//     }
-
-//     _delay_ms(2000);
-//     // dim green
-//     for (i = 0; i < 128; i++) {
-//         cli();
-//         pwmg--;
-//         OCR0B = pwmg;
-//         sei();
-//         _delay_ms(10);
-//     }
-
-//     _delay_ms(2000);
-//     // brighten green
-//     for (i = 0; i < 128; i++) {
-//         cli();
-//         pwmg++;
-//         OCR0B = pwmg;
-//         sei();
-//         _delay_ms(10);
-//     }
-
-//     _delay_ms(2000);
-//     // brighten green and blue
-//     for (i = 0; i < 127; i++) {
-//         cli();
-//         pwmg++;
-//         pwmb++;
-//         OCR0B = pwmg;
-//         OCR0A = pwmb;
-//         sei();
-//         _delay_ms(10);
-//     }
-
-//     // brighten blue
-//     for (i = 0; i < 128; i++) {
-//         cli();
-//         pwmb++;
-//         OCR0A = pwmb;
-//         sei();
-//         _delay_ms(10);
-//     }
-// }
-
-// bool transitioning = false;
-// bool transition_finished = false;
-
-
-// // void brite(uint8_t* pwm_target){
-
-// // }
 // takes in _time[3] by reference and outputs the proper pwm values
-void pwm_curve(uint8_t* _time, uint8_t* pwm_target){
-    bool daytime = (
-                    (_time[0] >= WAKEUP_HOR) && (_time[0] < DIM_HOR)
-                    /*&& (_time[1] >= WAKEUP_MIN) && (_time[1] < DIM_MIN)*/
-                    );
-    // if ((_time[0] >= WAKEUP_HOR) && (_time[0] < DIM_HOR)){
-    //     daytime = true;
-    //     if ((_time[1] >= WAKEUP_MIN) && (_time[1] < DIM_MIN))
-    // }
-    bool evening = (
-                    (_time[0] >= DIM_HOR) && (_time[0] < SLEEP_HOR)
-                    && (_time[1] >= DIM_MIN) && (_time[1] < SLEEP_MIN)
-                    );
-    bool sleep = (
-                    ((_time[0] >= SLEEP_HOR) && (_time[0] < 0)
-                    && (_time[1] >= SLEEP_MIN) && (_time[1] < 0))
-                    || 
-                    ((_time[0] >= 0) && (_time[0] < WAKEUP_HOR)
-                    && (_time[1] >= 0) && (_time[1] < WAKEUP_MIN))
-                    );
+void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
+    bool daytime = false, evening = false, sleep = false;
+    bool transition = false;
+
+    if (_time[0] >= WAKEUP_HOR & ~daytime){
+        if (_time[1] >= DIM_MIN){
+            daytime = false;
+            serial_write_string("daytime false");
+        }
+    }
+
+    if ((_time[0] >= DIM_HOR) && (_time[0] < SLEEP_HOR)){
+        evening = true;
+        if (~((_time[1] >= DIM_MIN) && (_time[1] < SLEEP_MIN))){
+            evening = false;
+        }
+    }
+
+    if ((_time[0] >= SLEEP_HOR) && (_time[0] < 0)){
+        sleep = true;
+        if (~((_time[1] >= SLEEP_MIN) && (_time[1] < 0))){
+            sleep = false;
+        }
+    }
+    else if ((_time[0] >= 0) && (_time[0] < WAKEUP_HOR)){
+        sleep = true;
+        if (~((_time[1] >= 0) && (_time[1] < WAKEUP_MIN))){
+            sleep = false;
+        }
+    }
+
     if (daytime){
         // set target pwm values
-        // if(!transitioning && !transition_finished){
-        //     pwm_target = pwm_day;
-        //     transitioning = true;
-        // }
-        // else if (transitioning && !transition_finished){
-        //     // brite(pwm_target); // should output transition_finished true when done
-        // }
-        // else if (transitioning && transition_finished){
-        //     transition_finished = true;
+        // if (!transition){
+        //     uint8_t i;
+        //     if (pwm_act[0] < pwm_target[0]){
+        //         for (i = pwm_act[0]; i < pwm_target[0]; i++){
+        //             pwm_act[0] = i;
+        //             _delay_ms(10);
+        //         }
+        //     }
+        //     else if(pwm_act[0] < pwm_target[0])
+            
+        //     transition = false;
         // }
         pwm_target[0] = pwm_day[0];
         pwm_target[1] = pwm_day[1];

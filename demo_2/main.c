@@ -42,6 +42,7 @@ int main (void) {
             bufPut(red, green, blue);
         }
         
+        /*************** SIGNAL PROCESSING **********************/
         // build average to mitigate noise
         uint32_t redTot = 0, greenTot = 0, blueTot = 0;
         uint16_t redAvg, greenAvg, blueAvg;
@@ -59,64 +60,42 @@ int main (void) {
         uint8_t scaledRed = (uint8_t)(((double)redAvg/65536) * 255);
         uint8_t scaledGreen = (uint8_t)(((double)greenAvg/65536) * 255);
         uint8_t scaledBlue = (uint8_t)(((double)blueAvg/65536) * 255);
-
-        // serial_write('R');
-        // serial_write_uint16(scaledRed);
-        // serial_write('G');
-        // serial_write_uint16(scaledGreen);
-        // serial_write('B');
-        // serial_write_uint16(scaledBlue);
         
-        pwm_curve(timeNow, pwm_target);
+        /*************** ADAPTIVE PWM **********************/
+        pwm_curve(timeNow, pwm_act, pwm_target);
         // pwm attempt2 TO TRY TOMORROW
-        if (scaledRed < pwm_target[0])
-            pwm_act[0] = (uint8_t)(((double)scaledRed/(double)pwm_target[0]) * 255);
+        serial_write_uint16(scaledRed);
+        if (scaledRed < pwm_target[0]){
+            uint8_t start = pwm_act[0];
+            //uint8_t end = (uint8_t)(((double)scaledRed/(double)pwm_target[0]) * 255);
+            uint8_t end = scaledRed;
+
+            uint8_t i;
+            // gradualy bring pwm_act to scaledRed
+            for (i = start; i < end; i++){
+                pwm_act[0] = i;
+                OCR1A = pwm_act[0];
+                send_red(pwm_act[0]);
+
+                _delay_ms(5);
+            }
+        }
+            
         else
             pwm_act[0] = pwm_target[0];
-            
-        // pwm attempt1
-        // // serial_write_uint16((uint16_t)pwm_target[0]);
-        // if(pwm_act[0] < pwm_target[0] - PWM_LIMIT){
-        //     if(n < PWM_LIMIT){
-        //         pwm_act[0] += 1;
-        //         n++;                
-        //     }
-        //     else{
-        //         n = 0;
-        //     }
-        //     // serial_write_string("too low");
-        // }
-        // else if (pwm_act[0] > pwm_target[0] + PWM_LIMIT){
-        //     if(n < PWM_LIMIT){
-        //         pwm_act[0] -= 1;
-        //         n++;                
-        //     }
-        //     else{
-        //         n = 0;
-        //     }
-        //     // serial_write_string("too high");
-            
-        // }
-        // else{
-        //     if(scaledRed > pwm_target[0] + PWM_BUF)
-        //         pwm_act[0] -= 1;            
-        //     else if (scaledRed < pwm_target[0] - PWM_BUF)
-        //         pwm_act[0] += 1;
-        //     // serial_write_string("control");
-            
-        // }
-        // serial_write_uint16((uint16_t)pwm_act[0]);
         
+
+        /*************** SEND PWM DATA TO PERIPH BOARD **********************/
+        send_red(pwm_act[0]);
         OCR1A = pwm_act[0];
 
-        serial_write_uint16(timeNow[0]);
-        serial_write_string(":");
-        serial_write_uint16(timeNow[1]);
-        serial_write_string(":");
-        serial_write_uint16(timeNow[2]);
-        serial_write_string("    ");
 
-
+        // serial_write_uint16(timeNow[0]);
+        // serial_write_string(":");
+        // serial_write_uint16(timeNow[1]);
+        // serial_write_string(":");
+        // serial_write_uint16(timeNow[2]);
+        // serial_write_string("    ");
 
         //_delay_ms(1000);*/
         _delay_ms(100);

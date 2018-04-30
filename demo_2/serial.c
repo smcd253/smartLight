@@ -6,6 +6,7 @@
 #include "common.h"
 
 char serial_read() {
+    PORTD &= ~(1 << PD3);
     char received_byte;
     while ((UCSR0A & ( 1 << RXC0 )) == 0) {}
     received_byte = UDR0;
@@ -13,11 +14,13 @@ char serial_read() {
 }
 
 void serial_write(char c) {
+    PORTD &= ~(1 << PD3);
     while ((UCSR0A & ( 1 << UDRE0 )) == 0) {} 
     UDR0 = c;   
 }
 
 void serial_write_uint16(uint16_t n) {
+    PORTD &= ~(1 << PD3);
     int i = 0;
     char s[20];
     serial_write(' ');
@@ -36,6 +39,7 @@ void serial_write_uint16(uint16_t n) {
 }
 
 void serial_write_string(char* s) {
+    PORTD &= ~(1 << PD3);
     for (; *s; s++)
         serial_write(*s);
 }
@@ -48,4 +52,23 @@ void serial_init() {
     PORTD &= ~(1 << PD3);
     //PORTD |= 1 << PD3;
     serial_write_string("----serial initialized----");
+}
+
+void serial_write_char_to_peripheral(char c) {
+    PORTD |= 1 << PD3;
+    _delay_us(1);
+    while ((UCSR0A & (1 << UDRE0)) == 0);
+    UDR0 = c;
+}
+
+void send_red(uint8_t c) {
+    serial_write_char_to_peripheral((c & ~(3)) + 0);
+}
+
+void send_green(uint8_t c) {
+    serial_write_char_to_peripheral((c & ~(3)) + 1);
+}
+
+void send_blue(uint8_t c) {
+    serial_write_char_to_peripheral((c & ~(3)) + 2);
 }

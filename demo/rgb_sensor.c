@@ -47,8 +47,7 @@ bool rgb_init() {
     bool ret = true;
     data = read8(DEVICE_ID);
     serial_write_string("DEVICE_ID:");
-    serial_write_uint16(data);
-    serial_write_string("1");
+    // serial_write_uint16(data);
     if (data != 0x7D) {
         //ret &= false;
         serial_write_string(" data!=0x7D");

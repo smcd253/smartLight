@@ -3,11 +3,6 @@
 
 #include <avr/io.h>
 
-#define NULL 0
-#define FOSC 7372800
-//#define BDIV (FOSC/500000-16)/2+1
-#define BDIV (FOSC/500000-16)/2+1
-#define BAUD_PRESCALE 47
 
 #define ISL_I2C_ADDR 0x88
 
@@ -96,13 +91,13 @@
 
 #define MOV_AVG_BUF_SIZE 100
 // global variables
-volatile uint16_t redBuf[MOV_AVG_BUF_SIZE];
-volatile uint16_t greenBuf[MOV_AVG_BUF_SIZE];
-volatile uint16_t blueBuf[MOV_AVG_BUF_SIZE];
+// volatile uint16_t redBuf[MOV_AVG_BUF_SIZE];
+// volatile uint16_t greenBuf[MOV_AVG_BUF_SIZE];
+// volatile uint16_t blueBuf[MOV_AVG_BUF_SIZE];
 
-volatile uint16_t redAvg;
-volatile uint16_t greenAvg;
-volatile uint16_t blueAvg;
+// volatile uint16_t redAvg;
+// volatile uint16_t greenAvg;
+// volatile uint16_t blueAvg;
 
 // function declarations
 

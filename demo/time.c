@@ -49,12 +49,9 @@ void init_rtclk(){
     write8_clk(MIN, TIME_MIN);
     write8_clk(HOR, TIME_HOR);
 }
-uint8_t* readTime(){
-    uint8_t* _time = malloc(24);
-    _time = (uint8_t[3]){0, 0, 0};
+void readTime(uint8_t* _time){
     _time[2] = read8_clk(SEC) & ((1 << 6) - 1);
     _time[1] = read8_clk(MIN) & ((1 << 6) - 1);
     _time[0] = read8_clk(HOR) & ((1 << 5) - 1);
-    serial_write_string("end of readTime()");
-    return _time;
+    serial_write_string(" end of readTime()");
 }

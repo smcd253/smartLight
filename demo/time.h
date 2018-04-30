@@ -8,11 +8,6 @@
 TODO: 1. make a general i2c script and header file
     2. make specific time and rgb_sensor scripts and header files
 */
-// #define NULL 0
-// #define FOSC 7372800
-// //#define BDIV (FOSC/500000-16)/2+1
-// #define BDIV (FOSC/500000-16)/2+1
-// #define BAUD_PRESCALE 47
 
 #define RTCLK_I2C_ADDR 0xA3
 #define SEC 0x02
@@ -40,6 +35,6 @@ void write8_clk(uint8_t reg, uint8_t data);
 
 void init_rtclk(void);
 
-uint8_t* readTime(void);
+void readTime(uint8_t* _time);
 
 #endif

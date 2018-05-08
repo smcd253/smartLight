@@ -55,33 +55,6 @@ void init_pwm(){
 bool daytime = false, evening = false, sleep = false;
 uint8_t oldSec;
 void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
-    // if ((_time[0] >= WAKEUP_HOR) && (_time[0] < DIM_HOR)){
-    //     daytime = true;
-    //     if ((_time[1] < WAKEUP_MIN) && (_time[0] == WAKEUP_HOR)){
-    //         daytime = false;
-    //     }
-    // }
-
-    // if ((_time[0] >= DIM_HOR) && (_time[0] < SLEEP_HOR)){
-    //     evening = true;
-    //     if ((_time[1] < DIM_MIN) && (_time[0] == DIM_HOR)){
-    //         evening = false;
-    //     }
-    // }
-
-    // if ((_time[0] >= SLEEP_HOR) && (_time[0] < 0)){
-    //     sleep = true;
-    //     if ((_time[1] < SLEEP_MIN) && (_time[0] == SLEEP_HOR)){
-    //         sleep = false;
-    //     }
-    // }
-    // else if ((_time[0] >= 0) && (_time[0] < WAKEUP_HOR)){
-    //     sleep = true;
-    //     if ((_time[1] < SLEEP_MIN) && (_time[0] == 0)){
-    //         sleep = false;
-    //     }
-    // }
-
     if ((_time[2] >= 00) && (_time[2] < 10)){
         daytime = true;
         evening = false;
@@ -114,26 +87,7 @@ void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
         pwm_act[0] = (_time[2]*pwm_target[0])/10;
         pwm_act[1] = (_time[2]*pwm_target[1])/10;
         pwm_act[2] = (_time[2]*pwm_target[2])/10;
-        
-        // if (_time[2] != oldSec){
-        //     if (pwm_act[0] < pwm_target[0]){
-        //         pwm_act[0] += 20;
-        //     }
-        //     else if(pwm_act[0] > pwm_target[0]){
-        //         pwm_act[0] -= 20;
-        //     }
-        //     if (pwm_act[1] < pwm_target[1]){
-        //         pwm_act[1] += 20;
-        //     }
-        //     else if(pwm_act[1] > pwm_target[1]){
-        //         pwm_act[1] -= 20;
-        //     }
-        //     if (pwm_act[2] < pwm_target[2]){
-        //         pwm_act[2] += 20;
-        //     }
-        //     else if(pwm_act[2] > pwm_target[2]){
-        //     }
-        // }
+
     }
     else if (evening){  
         serial_write_string("evening");
@@ -141,34 +95,15 @@ void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
         pwm_target[1] = pwm_evening[1];
         pwm_target[2] = pwm_evening[2];
 
-        pwm_act[0] = 255;
-        pwm_act[1] = 255 - (_time[2] - 20) * 12;
-        pwm_act[2] = 255 - (_time[2] - 20) * 25;
-        //pwm_act[0] = (uint8_t)(((uint16_t)_time[2] - 20)*(uint16_t)pwm_target[0] + (30 - (uint16_t)_time[2]) * (uint16_t)pwm_day[0])/10;
-        //pwm_act[1] = (uint8_t)(((uint16_t)_time[2] - 20)*(uint16_t)pwm_target[1] + (30 - (uint16_t)_time[2]) * (uint16_t)pwm_day[1])/10;
-        //pwm_act[2] = (uint8_t)(((uint16_t)_time[2] - 20)*(uint16_t)pwm_target[2] + (30 - (uint16_t)_time[2]) * (uint16_t)pwm_day[2])/10;
+        // pwm_act[0] = 255;
+        // pwm_act[1] = 255 - (_time[2] - 20) * 12;
+        // pwm_act[2] = 255 - (_time[2] - 20) * 25;
+        pwm_act[0] = (uint8_t)(((uint16_t)_time[2] - 20)*(uint16_t)pwm_target[0] + (30 - (uint16_t)_time[2]) * (uint16_t)pwm_day[0])/10;
+        pwm_act[1] = (uint8_t)(((uint16_t)_time[2] - 20)*(uint16_t)pwm_target[1] + (30 - (uint16_t)_time[2]) * (uint16_t)pwm_day[1])/10;
+        pwm_act[2] = (uint8_t)(((uint16_t)_time[2] - 20)*(uint16_t)pwm_target[2] + (30 - (uint16_t)_time[2]) * (uint16_t)pwm_day[2])/10;
 
-        // // set target pwm values
-        // if (_time[2] != oldSec){
-        //     if (pwm_act[0] < pwm_target[0]){
-        //         pwm_act[0] += 20;
-        //     }
-        //     else if(pwm_act[0] > pwm_target[0]){
-        //         pwm_act[0] -= 20;
-        //     }
-        //     if (pwm_act[1] < pwm_target[1]){
-        //         pwm_act[1] += 20;
-        //     }
-        //     else if(pwm_act[1] > pwm_target[1]){
-        //         pwm_act[1] -= 20;
-        //     }
-        //     if (pwm_act[2] < pwm_target[2]){
-        //         pwm_act[2] += 20;
-        //     }
-        //     else if(pwm_act[2] > pwm_target[2]){
-        //     }
-        // }
     }
+    
     else if (sleep){
         serial_write_string("night");
         
@@ -190,33 +125,13 @@ void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
             pwm_target[2] = pwm_night[2];
         }
 
-        // pwm_act[0] = 0;
-        // pwm_act[1] = 255 - (_time[2] - 40) * 25;
-        // pwm_act[2] = 255 - (_time[2] - 40) * 25;
+        // pwm_act[0] = 255 - (_time[2] - 40) * 12;
+        // pwm_act[1] = 128 - (_time[2] - 40) * 12;
+        // pwm_act[2] = 0;
         pwm_act[0] = ((_time[2] - 40)*pwm_target[0] + ((50 - _time[2]) * pwm_evening[0]))/10;
         pwm_act[1] = ((_time[2] - 40)*pwm_target[1] + ((50 - _time[2]) * pwm_evening[1]))/10;
         pwm_act[2] = ((_time[2] - 40)*pwm_target[2] + ((50 - _time[2]) * pwm_evening[2]))/10;
 
-        // // set target pwm values
-        // if (_time[2] != oldSec){
-        //     if (pwm_act[0] < pwm_target[0]){
-        //         pwm_act[0] += 20;
-        //     }
-        //     else if(pwm_act[0] > pwm_target[0]){
-        //         pwm_act[0] -= 20;
-        //     }
-        //     if (pwm_act[1] < pwm_target[1]){
-        //         pwm_act[1] += 20;
-        //     }
-        //     else if(pwm_act[1] > pwm_target[1]){
-        //         pwm_act[1] -= 20;
-        //     }
-        //     if (pwm_act[2] < pwm_target[2]){
-        //         pwm_act[2] += 20;
-        //     }
-        //     else if(pwm_act[2] > pwm_target[2]){
-        //     }
-        // }
     }
     oldSec = _time[2];
 }                

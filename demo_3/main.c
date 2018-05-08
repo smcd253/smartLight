@@ -93,7 +93,7 @@ int main (void) {
             for (i = start; i > end; i--){
                 pwm_act[0] = i;
                 setRed();
-                _delay_ms(20);
+                _delay_ms(10);
             }
         }   
         else{
@@ -109,7 +109,7 @@ int main (void) {
             for (i = start; i > end; i--){
                 pwm_act[1] = i;
                 setGreen();
-                _delay_ms(20);
+                _delay_ms(10);
             }
         }   
         else{
@@ -125,14 +125,14 @@ int main (void) {
             for (i = start; i > end; i--){
                 pwm_act[2] = i;
                 setBlue();
-                _delay_ms(20);
+                _delay_ms(10);
             }
         }   
         else{
             pwm_act[2] = pwm_target[2];
         }
 
-        /*************** SEND PWM DATA TO PERIPH BOARD **********************/
+        /*************** SET PWM and SEND DATA TO PERIPH BOARD **********************/
         setRed();
         setGreen();
         setBlue();

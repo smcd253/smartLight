@@ -103,7 +103,7 @@ void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
         sleep = false;
     }
     if (daytime){
-        serial_write_string("daytime");
+        // serial_write_string("daytime");
         
         pwm_target[0] = pwm_day[0];
         pwm_target[1] = pwm_day[1];
@@ -136,7 +136,7 @@ void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
         // }
     }
     else if (evening){  
-        serial_write_string("evening");
+        // serial_write_string("evening");
         pwm_target[0] = pwm_evening[0];
         pwm_target[1] = pwm_evening[1];
         pwm_target[2] = pwm_evening[2];
@@ -170,7 +170,7 @@ void pwm_curve(uint8_t* _time, uint8_t* pwm_act, uint8_t* pwm_target){
         // }
     }
     else if (sleep){
-        serial_write_string("night");
+        // serial_write_string("night");
         
         if (pir_is_on()){
             awake = true;
